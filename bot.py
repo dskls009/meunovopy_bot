@@ -40,11 +40,11 @@ class Bot():
         'para ver noticias do g1/mundo digite /noticia\n'
         'para pesquisar a traducao de uma palavra em japones digite /jisho <palavra>')
 
-class Dicio():
+class Dicionario():
 
     def dicio(update:Update, context:CallbackContext):
         dicio = Dicio()
-        palavra = dicio.search(context.args)
+        palavra = dicio.search(context.args[0])
         sinonimos = ''
         if update.message.text[0:12] == "/significado":
             context.bot.send_message(chat_id=update.effective_chat.id, text=palavra.meaning)
@@ -187,9 +187,9 @@ def main():
     dispatcher.add_handler(CommandHandler("more", YoutubeSearch.youtube))
     dispatcher.add_handler(CommandHandler("jisho", JishoOrg.jisho))
     dispatcher.add_handler(CommandHandler("motto", JishoOrg.jisho))
-    dispatcher.add_handler(CommandHandler("significado", Dicio.dicio))
-    dispatcher.add_handler(CommandHandler("etimologia", Dicio.dicio))
-    dispatcher.add_handler(CommandHandler("sinonimos", Dicio.dicio))
+    dispatcher.add_handler(CommandHandler("significado", Dicionario.dicio))
+    dispatcher.add_handler(CommandHandler("etimologia", Dicionario.dicio))
+    dispatcher.add_handler(CommandHandler("sinonimos", Dicionario.dicio))
 
     updater.start_polling()
 
