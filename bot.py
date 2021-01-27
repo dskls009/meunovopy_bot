@@ -52,7 +52,7 @@ class Dicionario():
             context.bot.send_message(chat_id=update.effective_chat.id, text=palavra.etymology)
         elif update.message.text[0:10] == "/sinonimos":
             for sinonimo in palavra.synonyms:
-                sinonimos = sinonimos+sinonimo+', '
+                sinonimos = sinonimos+sinonimo.word+', '
             context.bot.send_message(chat_id=update.effective_chat.id, text=sinonimos[:-2])
 
 class JishoOrg():
