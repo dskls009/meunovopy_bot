@@ -47,13 +47,25 @@ class Dicionario():
         palavra = dicio.search(context.args[0])
         sinonimos = ''
         if update.message.text[0:12] == "/significado":
-            context.bot.send_message(chat_id=update.effective_chat.id, text=palavra.meaning)
+            if palavra is None:
+                context.bot.send_message(chat_id=update.effective_chat.id, text="Escreveu direitinho? Em português? Porque, olha, não achei nada aqui não...")
+                return
+            else:
+                context.bot.send_message(chat_id=update.effective_chat.id, text=palavra.meaning)
         elif update.message.text[0:11] == "/etimologia":
-            context.bot.send_message(chat_id=update.effective_chat.id, text=palavra.etymology)
+            if palavra is None:
+                context.bot.send_message(chat_id=update.effective_chat.id, text="Escreveu direitinho? Em português? Porque, olha, não achei nada aqui não...")
+                return
+            else:
+                context.bot.send_message(chat_id=update.effective_chat.id, text=palavra.etymology)
         elif update.message.text[0:10] == "/sinonimos":
-            for sinonimo in palavra.synonyms:
-                sinonimos = sinonimos+sinonimo.word+', '
-            context.bot.send_message(chat_id=update.effective_chat.id, text=sinonimos[:-2])
+            if palavra is None:
+                context.bot.send_message(chat_id=update.effective_chat.id, text="Escreveu direitinho? Em português? Porque, olha, não achei nada aqui não...")
+                return
+            else:
+                for sinonimo in palavra.synonyms:
+                    sinonimos = sinonimos+sinonimo.word+', '
+                context.bot.send_message(chat_id=update.effective_chat.id, text=sinonimos[:-2])
 
 class JishoOrg():
     
