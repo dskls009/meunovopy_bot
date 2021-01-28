@@ -6,11 +6,12 @@ from bs4 import BeautifulSoup
 import argparse
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, message
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler
-import datetime
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import requests
 from dicio import Dicio
+from numpy import random
+from models import db, Awa_Foto
 from variaveis import TOKEN, DEVELOPER_KEY
 
 # Enable logging
@@ -30,6 +31,7 @@ CONTEXTO_BUSCA_JISHO = None
 CHAT_OQ_JISHO = {}
 CHAT_INT_JISHO = {}
 SITE = 'https://jisho.org/api/v1/search/words?'
+AGUA = {}
 
 class Bot():
 
@@ -39,6 +41,44 @@ class Bot():
         'para ver outro video digite /more\n'
         'para ver noticias do g1/mundo digite /noticia\n'
         'para pesquisar a traducao de uma palavra em japones digite /jisho <palavra>')
+
+    def agua_meme(context:CallbackContext, update):
+        agua = []
+        fotos = Awa_Foto.query.filter_by(chat_id=str(update.effective_chat.id)).all()
+        for foto in fotos:
+            agua.append(foto.file_id)
+        x = random.randint(len(agua))
+        context.bot.send_photo(chat_id=update.effective_chat.id, photo=agua[x])
+
+    def add_agua_meme(update:Update, context:CallbackContext):
+        for foto in update.message.photo:
+            if foto.file_id:
+                awa_foto = Awa_Foto(file_id=foto.file_id, chat_id=str(update.effective_chat.id))
+                db.session.add(awa_foto)
+                db.session.commit()
+                return
+
+    def agua(update:Update, context:CallbackContext):
+        global AGUA
+        if update.effective_chat.id in AGUA:
+            fotos = Awa_Foto.query.filter_by(chat_id=str(update.effective_chat.id)).all()
+            if len(fotos) == 0:
+                context.bot.send_message(chat_id=update.effective_chat.id, text="Lista de memes vazia.")
+                return
+            if not AGUA.get(update.effective_chat.id):
+                AGUA.update({update.effective_chat.id:True})
+                context.job_queue.run_repeating(Bot.agua_meme(context, update), 36000, 2)
+            elif AGUA.get(update.effective_chat.id):
+                AGUA.update({update.effective_chat.id:False})
+                context.bot.send_message(chat_id=update.effective_chat.id, text="Comando cancelado!")
+        else:
+            AGUA[update.effective_chat.id] = False
+            fotos = Awa_Foto.query.filter_by(chat_id=str(update.effective_chat.id)).all()
+            if len(fotos) == 0:
+                context.bot.send_message(chat_id=update.effective_chat.id, text="Lista de memes vazia.")
+                return
+            AGUA.update({update.effective_chat.id:True})
+            context.job_queue.run_repeating(Bot.agua_meme(context, update), 36000, 2)
 
 class Dicionario():
 
@@ -194,6 +234,7 @@ def main():
     dispatcher = updater.dispatcher
 
     dispatcher.add_handler(CommandHandler("start", Bot.start))
+    dispatcher.add_handler(CommandHandler("agua", Bot.agua))
     dispatcher.add_handler(CommandHandler("noticia", NewsSearch.noticias))
     dispatcher.add_handler(CommandHandler("youtube", YoutubeSearch.youtube))
     dispatcher.add_handler(CommandHandler("more", YoutubeSearch.youtube))
@@ -202,6 +243,8 @@ def main():
     dispatcher.add_handler(CommandHandler("significado", Dicionario.dicio))
     dispatcher.add_handler(CommandHandler("etimologia", Dicionario.dicio))
     dispatcher.add_handler(CommandHandler("sinonimos", Dicionario.dicio))
+
+    dispatcher.add_handler(MessageHandler(Filters.photo, Bot.add_agua_meme))
 
     updater.start_polling()
 
