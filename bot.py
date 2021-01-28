@@ -37,10 +37,17 @@ class Bot():
 
     def start(update: Update, context: CallbackContext) -> None:
         update.message.reply_text('oi chocoleute eu sou um bot em fase de testes\n'
-        'para pesquisar um video no youtube digite /youtube <pesquisa>\n'
-        'para ver outro video digite /more\n'
-        'para ver noticias do g1/mundo digite /noticia\n'
-        'para pesquisar a traducao de uma palavra em japones digite /jisho <palavra>')
+        '/start: lista os comandos do bot\n'
+        '/noticia: busca a noticia mais recente do site g1/mundo\n'
+        '/youtube [pesquisa]: busca um vídeo no youtube\n'
+        '/more: busca o próximo vídeo da busca anterior no youtube, até o vigésimo quinto\n'
+        '/jisho [palavra]: busca uma palavra no dicionário japonês-inglês\n'
+        '/motto: busca o próximo registro no dicionário\n'
+        '/significado [palavra]: busca o significado de uma palavra no dicionário\n'
+        '/etimologia [palavra]: busca a etimologia de uma palavra no dicionário\n'
+        '/sinonimos [palavra]: busca sinônimos de uma palavra no dicionário\n'
+        '/agua: inicia um alarme que manda uma foto de hora em hora no chat\n'
+        'para adicionar fotos à lista, basta enviar uma foto respondendo o bot')
 
     def agua_meme(context:CallbackContext, update):
         agua = []
