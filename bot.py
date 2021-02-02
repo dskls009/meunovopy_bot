@@ -93,19 +93,19 @@ class Dicionario():
         dicio = Dicio()
         palavra = dicio.search(context.args[0])
         sinonimos = ''
-        if update.message.text[0:12] == "/significado":
+        if update.message.text[0:12].lower() == "/significado":
             if palavra is None:
                 context.bot.send_message(chat_id=update.effective_chat.id, text="Escreveu direitinho? Em português? Porque, olha, não achei nada aqui não...")
                 return
             else:
                 context.bot.send_message(chat_id=update.effective_chat.id, text=palavra.meaning)
-        elif update.message.text[0:11] == "/etimologia":
+        elif update.message.text[0:11].lower() == "/etimologia":
             if palavra is None:
                 context.bot.send_message(chat_id=update.effective_chat.id, text="Escreveu direitinho? Em português? Porque, olha, não achei nada aqui não...")
                 return
             else:
                 context.bot.send_message(chat_id=update.effective_chat.id, text=palavra.etymology)
-        elif update.message.text[0:10] == "/sinonimos":
+        elif update.message.text[0:10].lower() == "/sinonimos":
             if palavra is None:
                 context.bot.send_message(chat_id=update.effective_chat.id, text="Escreveu direitinho? Em português? Porque, olha, não achei nada aqui não...")
                 return
@@ -120,17 +120,17 @@ class JishoOrg():
         global CONTEXTO_BUSCA_JISHO
         global CHAT_OQ_JISHO
         global CHAT_INT_JISHO
-        if context.args!=[] and update.message.text[0:6] == '/jisho':
+        if context.args!=[] and update.message.text[0:6].lower() == '/jisho':
             CONTEXTO_BUSCA_JISHO = context.args[0:]
             CHAT_OQ_JISHO[update.effective_chat.id] = CONTEXTO_BUSCA_JISHO
             CHAT_INT_JISHO[update.effective_chat.id] = 0
-        elif context.args==[] and update.message.text[0:6] == '/jisho':
+        elif context.args==[] and update.message.text[0:6].lower() == '/jisho':
             context.bot.send_message(chat_id=update.effective_user.id, text='Digite /jisho e o que deseja pesquisar.')
             return
-        elif context.args!=[] and update.message.text[0:6] == '/motto':
+        elif context.args!=[] and update.message.text[0:6].lower() == '/motto':
             context.bot.send_message(chat_id=update.effective_user.id, text='Não é assim que funciona o /motto.')
             return
-        elif context.args==[] and update.message.text[0:6] == '/motto':
+        elif context.args==[] and update.message.text[0:6].lower() == '/motto':
             CHAT_INT_JISHO[update.effective_chat.id]+= 1
 
         context.bot.send_message(chat_id=update.effective_chat.id, text=JishoOrg.busca_jisho(CONTEXTO_BUSCA_JISHO, update))
@@ -189,17 +189,17 @@ class YoutubeSearch():
         global CONTEXTO_BUSCA
         global CHAT_OQ
         global CHAT_INT
-        if context.args!=[] and update.message.text[0:8] == '/youtube':
+        if context.args!=[] and update.message.text[0:8].lower() == '/youtube':
             CONTEXTO_BUSCA = context.args[0:]
             CHAT_OQ[update.effective_chat.id] = CONTEXTO_BUSCA
             CHAT_INT[update.effective_chat.id] = 0
-        elif context.args==[] and update.message.text[0:8] == '/youtube':
+        elif context.args==[] and update.message.text[0:8].lower() == '/youtube':
             context.bot.send_message(chat_id=update.effective_user.id, text='Digite o que deseja pesquisar.')
             return
-        elif context.args!=[] and update.message.text[0:5] == '/more':
+        elif context.args!=[] and update.message.text[0:5].lower() == '/more':
             context.bot.send_message(chat_id=update.effective_user.id, text='Não é assim que funciona o /more.')
             return
-        elif context.args==[] and update.message.text[0:5] == '/more':
+        elif context.args==[] and update.message.text[0:5].lower() == '/more':
             CHAT_INT[update.effective_chat.id]+= 1
         
 
