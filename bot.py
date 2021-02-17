@@ -78,10 +78,10 @@ class Bot():
                 return
             if not AGUA.get(update.effective_chat.id):
                 AGUA.update({update.effective_chat.id:True})
-                context.job_queue.run_repeating(Bot.agua_meme, 36000, 2, name=update.effective_chat.id, context=update.effective_chat.id)
+                context.job_queue.run_repeating(Bot.agua_meme, 5400, 2, name=str(update.effective_chat.id), context=update.effective_chat.id)
             elif AGUA.get(update.effective_chat.id):
                 AGUA.update({update.effective_chat.id:False})
-                for job in context.job_queue.get_jobs_by_name(update.effective_chat.id):
+                for job in context.job_queue.get_jobs_by_name(str(update.effective_chat.id)):
                     job.schedule_removal()
                 context.bot.send_message(chat_id=update.effective_chat.id, text="Comando cancelado!")
         else:
@@ -91,7 +91,7 @@ class Bot():
                 context.bot.send_message(chat_id=update.effective_chat.id, text="Lista de memes vazia.")
                 return
             AGUA.update({update.effective_chat.id:True})
-            context.job_queue.run_repeating(Bot.agua_meme, 36000, 2, name=update.effective_chat.id, context=update.effective_chat.id)
+            context.job_queue.run_repeating(Bot.agua_meme, 5400, 2, name=str(update.effective_chat.id), context=update.effective_chat.id)
 
 class Dicionario():
 
