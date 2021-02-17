@@ -12,7 +12,8 @@ import requests
 from dicio import Dicio
 from numpy import random
 from models import db, Awa_Foto
-from variaveis import TOKEN, DEVELOPER_KEY
+from google_images_search import GoogleImagesSearch
+from variaveis import TOKEN, DEVELOPER_KEY, CX
 
 # Enable logging
 logging.basicConfig(
@@ -30,6 +31,9 @@ CHAT_INT = {}
 CONTEXTO_BUSCA_JISHO = None
 CHAT_OQ_JISHO = {}
 CHAT_INT_JISHO = {}
+CONTEXTO_BUSCA_IMG = None
+CHAT_OQ_IMG = {}
+CHAT_INT_IMG = {}
 SITE = 'https://jisho.org/api/v1/search/words?'
 AGUA = {}
 
@@ -234,6 +238,44 @@ class YoutubeSearch():
         
         return video
 
+class ImageSearch():
+    
+    def imagem(update:Update, context:CallbackContext):
+        global CONTEXTO_BUSCA_IMG
+        global CHAT_OQ_IMG
+        global CHAT_INT_IMG
+        if context.args!=[] and update.message.text[0:4].lower() == '/img':
+            CONTEXTO_BUSCA_IMG = context.args[0:]
+            CHAT_OQ_IMG[update.effective_chat.id] = CONTEXTO_BUSCA_IMG
+            CHAT_INT_IMG[update.effective_chat.id] = 0
+        elif context.args==[] and update.message.text[0:4].lower() == '/img':
+            context.bot.send_message(chat_id=update.effective_user.id, text='Digite /img e o que deseja pesquisar.')
+            return
+        elif context.args!=[] and update.message.text[0:5].lower() == '/next':
+            context.bot.send_message(chat_id=update.effective_user.id, text='Não é assim que funciona o /next.')
+            return
+        elif context.args==[] and update.message.text[0:5].lower() == '/next':
+            CHAT_INT_IMG[update.effective_chat.id]+= 1
+
+        parametros_busca = {
+            'q': CHAT_OQ_IMG.get(update.effective_chat.id),
+            'num': 10,
+            'safe': 'off',
+        }
+        gis = GoogleImagesSearch(DEVELOPER_KEY, CX)
+
+        imagens = []
+
+        gis.search(search_params=parametros_busca)
+        for image in gis.results():
+            imagens.append(image.url)
+
+        if CHAT_INT_IMG[update.effective_chat.id] == 9:
+            CHAT_INT_IMG[update.effective_chat.id] = 0
+        imagem = imagens[CHAT_INT_IMG.get(update.effective_chat.id)]
+
+        context.bot.send_photo(chat_id=update.effective_chat.id, photo=imagem)
+
 def main():
     updater = Updater(TOKEN, use_context=True)
     jobqueue = updater.job_queue
@@ -250,6 +292,8 @@ def main():
     dispatcher.add_handler(CommandHandler("significado", Dicionario.dicio))
     dispatcher.add_handler(CommandHandler("etimologia", Dicionario.dicio))
     dispatcher.add_handler(CommandHandler("sinonimos", Dicionario.dicio))
+    dispatcher.add_handler(CommandHandler("img", ImageSearch.imagem))
+    dispatcher.add_handler(CommandHandler("next", ImageSearch.imagem))
 
     dispatcher.add_handler(MessageHandler(Filters.photo, Bot.add_agua_meme))
 
