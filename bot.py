@@ -53,13 +53,13 @@ class Bot():
         '/agua: inicia um alarme que manda uma foto de hora em hora no chat\n'
         'para adicionar fotos à lista, basta enviar uma foto respondendo o bot')
 
-    def agua_meme(context:CallbackContext, update):
+    def agua_meme(context:CallbackContext):
         agua = []
-        fotos = Awa_Foto.query.filter_by(chat_id=str(update.effective_chat.id)).all()
+        fotos = Awa_Foto.query.filter_by(chat_id=str(context.job.context)).all()
         for foto in fotos:
             agua.append(foto.file_id)
         x = random.randint(len(agua))
-        context.bot.send_photo(chat_id=update.effective_chat.id, photo=agua[x])
+        context.bot.send_photo(chat_id=context.job.context, photo=agua[x])
 
     def add_agua_meme(update:Update, context:CallbackContext):
         for foto in update.message.photo:
@@ -78,7 +78,7 @@ class Bot():
                 return
             if not AGUA.get(update.effective_chat.id):
                 AGUA.update({update.effective_chat.id:True})
-                context.job_queue.run_repeating(Bot.agua_meme(context, update), 36000, 2)
+                context.job_queue.run_repeating(Bot.agua_meme, 36000, 2, context=update.effective_chat.id)
             elif AGUA.get(update.effective_chat.id):
                 AGUA.update({update.effective_chat.id:False})
                 context.bot.send_message(chat_id=update.effective_chat.id, text="Comando cancelado!")
@@ -89,7 +89,7 @@ class Bot():
                 context.bot.send_message(chat_id=update.effective_chat.id, text="Lista de memes vazia.")
                 return
             AGUA.update({update.effective_chat.id:True})
-            context.job_queue.run_repeating(Bot.agua_meme(context, update), 36000, 2)
+            context.job_queue.run_repeating(Bot.agua_meme, 36000, 2, context=update.effective_chat.id)
 
 class Dicionario():
 
