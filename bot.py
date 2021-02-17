@@ -63,7 +63,7 @@ class Bot():
                 awa_foto = Awa_Foto(file_id=foto.file_id, chat_id=str(update.effective_chat.id))
                 db.session.add(awa_foto)
                 db.session.commit()
-                return
+                break
 
     def agua(update:Update, context:CallbackContext):
         global AGUA
